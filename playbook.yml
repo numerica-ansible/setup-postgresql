@@ -1,0 +1,12 @@
+---
+- name: Install Postgresql
+  hosts:  all
+  gather_facts: True
+  gather_subset:
+    - network
+    - virtual
+  roles:
+    - { role:  install-source, tags: source }
+    - { role:  install-compiler-centos, tags: compiler-centos, when: ansible_distribution == 'CentOS'}
+    - { role:  install-compiler-ubuntu, tags: compiler-ubuntu, when: ansible_distribution == 'Ubuntu'}
+    #- { role:  sysdev.wordpress, tags: wordpress }

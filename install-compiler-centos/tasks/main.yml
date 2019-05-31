@@ -1,0 +1,12 @@
+---
+# tasks file for install-compiler-centos
+- name: Install gcc on centos
+  become: true
+  yum:
+    name: "@Development tools"
+    state: present
+- name: Install tools in centos
+  become: true
+  yum:
+    name: "@Development tools"
+    state: present

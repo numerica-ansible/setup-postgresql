@@ -1,0 +1,7 @@
+---
+# tasks file for install-source
+- name: download the latest postgresql release
+  unarchive:
+    src: https://github.com/postgres/postgres/archive/REL_11_3.tar.gz
+    dest: /home/{{ansible_ssh_user}}
+    remote_src: yes

@@ -1,0 +1,15 @@
+---
+# tasks file for install-compiler-ubuntu
+- name: update repo
+  become: true
+  apt:
+    update_cache: yes
+- name: install gcc compiler on ubuntu
+  become: true
+  apt:
+    name: "{{ packages}}"
+  vars:
+    packages:
+      - build-essential
+      - libssl-dev
+      - python-dev
