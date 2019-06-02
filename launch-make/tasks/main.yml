@@ -1,2 +1,42 @@
 ---
 # tasks file for launch-make
+- name: Configure and make
+  shell: cd /home/{{ansible_ssh_user}}/postgres-REL_11_3 && ./configure --prefix={{ postgres_path }} --with-openssl  --with-selinux --with-python
+  register:  config_return_value
+- name:  make main program
+  shell: cd /home/{{ansible_ssh_user}}/postgres-REL_11_3 && make
+  when: config_return_value.rc == 0
+- name:  make contrib programs
+  shell: cd /home/{{ansible_ssh_user}}/postgres-REL_11_3/contrib && make
+- name:  make install main program
+  become: true
+  shell: cd /home/{{ansible_ssh_user}}/postgres-REL_11_3 && make install
+- name:  make install contrib programs
+  become: true
+  shell: cd /home/{{ansible_ssh_user}}/postgres-REL_11_3/contrib && make install
+- name: Install postgresql service  in /etc/
+  become: true
+  template: src=postgresql.service.j2 dest=/etc/systemd/system/postgresql.service
+  when: ansible_distribution == 'CentOS'
+- name: Install postgresql service in /usr/lib
+  become: true
+  template: src=postgresql.service.j2 dest=/usr/lib/systemd/system/postgresql.service
+  when: ansible_distribution == 'CentOS'
+- name: Create password for postgres user
+  command: openssl rand -hex 7
+  register: postgres_password
+- name:  Ensure group postgres exists
+  become: true
+  group:
+    name: postgres
+    state: present
+- name: Create user postgres
+  become: true
+  user:
+    name: postgres
+    shell: /bin/bash
+    groups: postgres
+    append: yes
+    password: "{{postgres_password.stdout}}"
+- name: Get postgres passwor
+  debug: msg=" New postgres password is {{postgres_password.stdout}}"

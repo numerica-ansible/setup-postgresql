@@ -13,3 +13,8 @@
       - build-essential
       - libssl-dev
       - python-dev
+      - libreadline-dev
+      - libselinux1-dev
+      - zlib1g-dev
+      - bison
+      - flex

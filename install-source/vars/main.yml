@@ -1,2 +1,3 @@
 ---
 # vars file for install-source
+ansible_ssh_pipelining: true

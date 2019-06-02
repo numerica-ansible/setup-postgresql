@@ -1,2 +1,4 @@
 ---
 # vars file for launch-make
+ansible_ssh_pipelining: true
+postgres_path: /opt/pg113

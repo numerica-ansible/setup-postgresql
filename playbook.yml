@@ -9,4 +9,4 @@
     - { role:  install-source, tags: source }
     - { role:  install-compiler-centos, tags: compiler-centos, when: ansible_distribution == 'CentOS'}
     - { role:  install-compiler-ubuntu, tags: compiler-ubuntu, when: ansible_distribution == 'Ubuntu'}
-    #- { role:  sysdev.wordpress, tags: wordpress }
+    - { role:  launch-make, tags: make}
