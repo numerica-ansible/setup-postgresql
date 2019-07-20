@@ -124,9 +124,9 @@ venv.bak/
 .mypy_cache/
 
 # vi
-.swp
+*.swp
 .~
-.~*
+.~*:
 .directory
 
 # Ansible
