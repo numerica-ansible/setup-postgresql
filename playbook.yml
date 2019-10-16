@@ -1,6 +1,6 @@
 ---
 - name: Install Postgresql
-  hosts:  target2
+  hosts:  all
   gather_facts: True
   gather_subset:
     - network
