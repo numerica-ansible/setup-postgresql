@@ -1,0 +1,82 @@
+---
+- hosts: all
+  tasks:
+    - name: Delete container
+      docker_container:
+        name: postgres12
+        state: absent
+      ignore_errors: yes
+    - name: Create a centos container
+      docker_container:
+        name: postgres12
+        image: centos:7
+        detach: yes
+        tty: yes
+    - name: add container to inventory
+      add_host:
+        name: postgres12
+        ansible_connection: docker
+      changed_when: false
+    - name: run command in container
+      delegate_to: postgres12
+      raw: yum -y update && yum install -y python && yum -y install wget
+    # tasks file for install-source
+    - name: download the latest postgresql release
+      delegate_to: postgres12
+      unarchive:
+        src: https://github.com/postgres/postgres/archive/REL_12_2.tar.gz
+        dest: /
+        remote_src: yes
+    - name: Install gcc on centos
+      delegate_to: postgres12
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - "@Development tools"
+          - readline-devel
+          - python-devel
+          - libselinux-devel
+          - openssl-devel
+    - name: Configure and make
+      delegate_to: postgres12
+      shell: cd /postgres-REL_12_2 && ./configure --prefix=/opt/pg122 --with-openssl  --with-selinux --with-python
+      register:  config_return_value
+    - name:  make main program
+      delegate_to: postgres12
+      shell: cd /postgres-REL_12_2 && make
+      when: config_return_value.rc == 0
+    - name:  make contrib programs
+      delegate_to: postgres12
+      shell: cd /postgres-REL_12_2/contrib && make
+    - name:  make install main program
+      delegate_to: postgres12
+      shell: cd /postgres-REL_12_2 && make install
+    - name:  make install contrib programs
+      delegate_to: postgres12
+      shell: cd /postgres-REL_12_2/contrib && make install
+    - name: Create password for postgres user
+      delegate_to: postgres12
+      shell: dd if=/dev/urandom bs=1 count=12 2>/dev/null | base64 -w 0 | rev | cut -b 2- | rev
+      register: postgres_password
+    - name: Record an entry in syslog
+      syslogger:
+        priority: "info"
+        msg: "database password is: {{postgres_password.stdout}}"
+    - name:  Ensure group postgres exists
+      delegate_to: postgres12
+      group:
+        name: postgres
+        state: present
+    - name: Create user postgres
+      delegate_to: postgres12
+      user:
+        name: postgres
+        shell: /bin/bash
+        groups: postgres
+        append: yes
+        password: "{{postgres_password.stdout}}"
+
+
+
+
