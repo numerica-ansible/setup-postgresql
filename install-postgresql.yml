@@ -10,6 +10,7 @@
       docker_container:
         name: postgres12
         image: centos:7
+        log_driver: syslog
         detach: yes
         tty: yes
     - name: add container to inventory
@@ -60,6 +61,7 @@
       shell: dd if=/dev/urandom bs=1 count=12 2>/dev/null | base64 -w 0 | rev | cut -b 2- | rev
       register: postgres_password
     - name: Record an entry in syslog
+      delegate_to: postgres12
       syslogger:
         priority: "info"
         msg: "database password is: {{postgres_password.stdout}}"
