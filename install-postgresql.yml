@@ -64,7 +64,7 @@
       blockinfile:
         path: /home/$PWD/info
         block: |
-        "database password is: {{postgres_password.stdout}}"
+          "database password is: {{postgres_password.stdout}}"
     - name:  Ensure group postgres exists
       delegate_to: postgres12
       group:
