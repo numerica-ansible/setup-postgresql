@@ -60,9 +60,9 @@
       delegate_to: postgres12
       shell: dd if=/dev/urandom bs=1 count=12 2>/dev/null | base64 -w 0 | rev | cut -b 2- | rev
       register: postgres_password
-    - name: Record an entry in syslog
+    - name: Record an entry in local file, not in the docker container
       blockinfile:
-        path: /home/$PWD/info
+        path: $PWD/info
         block: |
           "database password is: {{postgres_password.stdout}}"
     - name:  Ensure group postgres exists
